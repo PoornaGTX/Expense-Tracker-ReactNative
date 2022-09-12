@@ -1,5 +1,5 @@
 import { useLayoutEffect, useContext } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet } from "react-native";
 import IconButton from "../components/UI/IconButton";
 
 //components
@@ -8,6 +8,7 @@ import Button from "../components/UI/Button";
 
 //context
 import { ExpensesContext } from "../store/expenses-context";
+import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
 const ManageExpense = ({ route, navigation }) => {
   const editedExpenseID = route.params?.expnseID;
@@ -51,6 +52,7 @@ const ManageExpense = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
+      <ExpenseForm />
       <View style={styles.buttons}>
         <Button
           style={styles.button}
