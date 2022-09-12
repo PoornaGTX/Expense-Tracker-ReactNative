@@ -25,6 +25,8 @@ const ExpenseForm = ({}) => {
         label="Description"
         textInputConfig={{
           multiline: true,
+          //autoCaptitalize:'words',
+          //autoCorrect: false, default is true
           onChangeText: amountChangeHandler,
         }}
       />
