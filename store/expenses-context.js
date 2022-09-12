@@ -31,30 +31,6 @@ const DUMMY_EXPENSES = [
     amount: 18.59,
     date: new Date("2022-02-18"),
   },
-  {
-    id: "e6",
-    description: "Some bananas",
-    amount: 59.99,
-    date: new Date("2021-12-01"),
-  },
-  {
-    id: "e7",
-    description: "A book",
-    amount: 14.99,
-    date: new Date("2021-02-19"),
-  },
-  {
-    id: "e8",
-    description: "Another book",
-    amount: 18.59,
-    date: new Date("2022-09-05"),
-  },
-  {
-    id: "e8",
-    description: "Another book",
-    amount: 18.59,
-    date: new Date("2022-09-05"),
-  },
 ];
 
 export const ExpensesContext = createContext({
@@ -70,7 +46,7 @@ const expensesReducer = (state, action) => {
     return [...state, { ...action.payload, id: id }];
   }
   if (action.type === "UPDATE") {
-    const updatableExpenseIndex = state.findIntex(
+    const updatableExpenseIndex = state.findIndex(
       (expense) => expense.id === action.payload.id
     );
     //access intndex in state array state[updatableExpenseIndex]
@@ -78,7 +54,7 @@ const expensesReducer = (state, action) => {
     const updateItem = { ...updatableExpense, ...action.payload.data };
     const updatedExpenses = [...state];
     updatedExpenses[updatableExpenseIndex] = updateItem;
-    return updatableExpense;
+    return updatedExpenses;
   }
 
   if (action.type === "DELETE") {
