@@ -1,0 +1,2 @@
+firebase is acting as backend 
+firebase alos genarating auto ID
