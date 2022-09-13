@@ -1,18 +1,23 @@
-import { useLayoutEffect, useContext } from "react";
+import { useLayoutEffect, useContext, useState } from "react";
 import { View, TextInput, StyleSheet } from "react-native";
 
 //components
 import { GlobalStyles } from "../constants/styles";
 import IconButton from "../components/UI/IconButton";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
+import ErrorOverLay from "../components/UI/ErrorOverLay";
 
 //context
 import { ExpensesContext } from "../store/expenses-context";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
 //http request
-import { storeExpense } from "../util/http";
+import { storeExpense, updateExpense, deleteExpense } from "../util/http";
 
 const ManageExpense = ({ route, navigation }) => {
+  const [isSubmiting, setIsSubmiting] = useState(false); //for loading sprinner
+  const [error, setError] = useState();
+
   const expenseCtx = useContext(ExpensesContext);
   const editedExpenseID = route.params?.expnseID;
 
@@ -29,24 +34,53 @@ const ManageExpense = ({ route, navigation }) => {
     });
   }, [navigation, isEdititng]);
 
-  const deleteExpenseHandler = () => {
-    expenseCtx.deleteExpense(editedExpenseID);
-    navigation.goBack(); //navigate to previous screen
+  const deleteExpenseHandler = async () => {
+    setIsSubmiting(true); //for loading sprinner
+
+    try {
+      await deleteExpense(editedExpenseID);
+      expenseCtx.deleteExpense(editedExpenseID);
+      navigation.goBack(); //navigate to previous screen
+    } catch (error) {
+      setError("Could not delete expense - please try agin later!");
+      setIsSubmiting(false); //for loading sprinner
+    }
   };
 
   const cancleExpenseHandler = () => {
     navigation.goBack(); //navigate to previous screen
   };
 
-  const ConfirmExpenseHandler = (expenseData) => {
-    if (isEdititng) {
-      expenseCtx.updateExpense(editedExpenseID, expenseData);
-    } else {
-      storeExpense(expenseData);
-      expenseCtx.addExpense(expenseData);
+  const ConfirmExpenseHandler = async (expenseData) => {
+    setIsSubmiting(true); //for loading sprinner
+
+    try {
+      if (isEdititng) {
+        //1st we update locally and then we update data base then we can optimize the performance
+        expenseCtx.updateExpense(editedExpenseID, expenseData);
+        await updateExpense(editedExpenseID, expenseData);
+      } else {
+        const id = await storeExpense(expenseData);
+        expenseCtx.addExpense({ ...expenseData, id: id });
+      }
+      navigation.goBack(); //navigate to previous screen
+    } catch (error) {
+      setError("Could not save date - please try again later");
+      setIsSubmiting(false);
     }
-    navigation.goBack(); //navigate to previous screen
   };
+
+  //for error
+
+  if (error && !isSubmiting) {
+    return <ErrorOverLay message={error} />;
+  }
+
+  //for loading sprinner
+
+  if (isSubmiting) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <View style={styles.container}>

@@ -1,2 +1,3 @@
 firebase is acting as backend 
 firebase alos genarating auto ID
+firebase post request return response with autogenrated key 

@@ -1,43 +1,16 @@
 import { createContext, useState, useReducer } from "react";
 
-const DUMMY_EXPENSES = [
-  {
-    id: "e1",
-    description: "A pair of shoes lk",
-    amount: 59.99,
-    date: new Date("2022-09-05"),
-  },
-  {
-    id: "e2",
-    description: "A pair of trousers",
-    amount: 89.29,
-    date: new Date("2022-01-05"),
-  },
-  {
-    id: "e3",
-    description: "Some bananas",
-    amount: 59.99,
-    date: new Date("2021-12-01"),
-  },
-  {
-    id: "e4",
-    description: "A book",
-    amount: 14.99,
-    date: new Date("2021-02-19"),
-  },
-];
-
 export const ExpensesContext = createContext({
   expenses: [],
   addExpense: ({ description, amount, date }) => {},
+  setExpenses: (expenses) => {},
   deleteExpense: (id) => {},
   updateExpense: (id, { description, amount, date }) => {},
 });
 
 const expensesReducer = (state, action) => {
   if (action.type === "ADD") {
-    const id = new Date().toString() + Math.random().toString();
-    return [...state, { ...action.payload, id: id }];
+    return [...state, action.payload];
   }
   if (action.type === "UPDATE") {
     const updatableExpenseIndex = state.findIndex(
@@ -55,14 +28,23 @@ const expensesReducer = (state, action) => {
     return state.filter((expense) => expense.id !== action.payload);
   }
 
+  if (action.type === "SET") {
+    const inverted = action.payload.reverse(); //to maintain order its mean new expense will come to first
+    return inverted;
+  }
+
   throw new Error(`no such action : ${action.type}`);
 };
 
 const ExpensesContextProvider = ({ children }) => {
-  const [expensesState, dispatch] = useReducer(expensesReducer, DUMMY_EXPENSES);
+  const [expensesState, dispatch] = useReducer(expensesReducer, []);
 
   const addExpenseMethod = (expenseDate) => {
     dispatch({ type: "ADD", payload: expenseDate });
+  };
+
+  const setExpenses = (expenses) => {
+    dispatch({ type: "SET", payload: expenses });
   };
 
   const updateExpenseMethod = (id, expenseDate) => {
@@ -76,6 +58,7 @@ const ExpensesContextProvider = ({ children }) => {
   const value = {
     expenses: expensesState,
     addExpense: addExpenseMethod,
+    setExpenses: setExpenses,
     updateExpense: updateExpenseMethod,
     deleteExpense: deleteExpenseMethod,
   };
