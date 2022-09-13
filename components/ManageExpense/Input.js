@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   label: {
-    fontSize: 12,
+    fontSize: 16,
     color: GlobalStyles.colors.primary100,
     marginBottom: 4,
   },
